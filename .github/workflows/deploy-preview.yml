@@ -17,8 +17,6 @@ jobs:
   deploy_preview:
     runs-on: ubuntu-latest
     continue-on-error: false
-    env:
-      results_file: ${{ runner.temp }}/serverize.json
     steps:
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
