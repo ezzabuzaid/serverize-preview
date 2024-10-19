@@ -49,7 +49,7 @@ jobs:
         if: ${{ github.event.action != 'closed' }}
         run: npx serverize deploy -c qa -r pr-${{ github.event.pull_request.number }} --output ${{ runner.temp }}/serverize.json
         env:
-          SERVERIZE_API_TOKEN: c39a578a3f4148d58396e06253577769
+          SERVERIZE_API_TOKEN: 7a43c42e761a4750bfef2ecc177de144
           # SERVERIZE_API_TOKEN: ${{ secrets.SERVERIZE_API_TOKEN }}
 
       - name: Set Deployment Output
