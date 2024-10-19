@@ -17,6 +17,9 @@ jobs:
   deploy_preview:
     runs-on: ubuntu-latest
     continue-on-error: false
+    permissions:
+      pull-requests: write
+      contents: read
     steps:
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
