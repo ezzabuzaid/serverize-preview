@@ -45,7 +45,7 @@ jobs:
       #     npm install
       #     npm run build
 
-      - name: Deploy
+      - name: Deploy To Serverize
         if: ${{ github.event.action != 'closed' }}
         run: npx serverize deploy -c qa -r pr-${{ github.event.pull_request.number }} --output ${{ runner.temp }}/serverize.json
         env:
@@ -56,6 +56,13 @@ jobs:
         id: read_output
         run: |
           echo "serverize=$(cat ${{ runner.temp }}/serverize.json | jq -r '.url')" >> $GITHUB_OUTPUT
+
+      - name: Remove Deployment
+        if: ${{ github.event.action == 'closed' }}
+        run: npx serverize releases stop -c qa -r pr-${{ github.event.pull_request.number }}
+        env:
+          SERVERIZE_API_TOKEN: 7a43c42e761a4750bfef2ecc177de144
+          # SERVERIZE_API_TOKEN: ${{ secrets.SERVERIZE_API_TOKEN }}
 
       - name: Comment Success
         if: ${{ success() }}
