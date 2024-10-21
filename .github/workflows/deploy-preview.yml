@@ -17,8 +17,9 @@ jobs:
   deploy_preview:
     runs-on: ubuntu-latest
     continue-on-error: false
-    env:
-      results_file: ${{ runner.temp }}/serverize.json
+    permissions:
+      pull-requests: write
+      contents: read
     steps:
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
@@ -33,10 +34,10 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: npm
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '20'
+      #     cache: npm
 
       # - name: Install and Build
       #   if: ${{ github.event.action != 'closed' }}
@@ -44,17 +45,24 @@ jobs:
       #     npm install
       #     npm run build
 
-      - name: Deploy
+      - name: Deploy To Serverize
         if: ${{ github.event.action != 'closed' }}
         run: npx serverize deploy -c qa -r pr-${{ github.event.pull_request.number }} --output ${{ runner.temp }}/serverize.json
         env:
-          SERVERIZE_API_TOKEN: c39a578a3f4148d58396e06253577769
+          SERVERIZE_API_TOKEN: 7a43c42e761a4750bfef2ecc177de144
           # SERVERIZE_API_TOKEN: ${{ secrets.SERVERIZE_API_TOKEN }}
 
       - name: Set Deployment Output
         id: read_output
         run: |
           echo "serverize=$(cat ${{ runner.temp }}/serverize.json | jq -r '.url')" >> $GITHUB_OUTPUT
+
+      - name: Remove Deployment
+        if: ${{ github.event.action == 'closed' }}
+        run: npx serverize releases stop -c qa -r pr-${{ github.event.pull_request.number }}
+        env:
+          SERVERIZE_API_TOKEN: 7a43c42e761a4750bfef2ecc177de144
+          # SERVERIZE_API_TOKEN: ${{ secrets.SERVERIZE_API_TOKEN }}
 
       - name: Comment Success
         if: ${{ success() }}
